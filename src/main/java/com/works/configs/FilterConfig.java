@@ -17,6 +17,7 @@ import javax.servlet.ServletResponse;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
+import lombok.RequiredArgsConstructor;
 import org.owasp.validator.html.AntiSamy;
 import org.owasp.validator.html.CleanResults;
 import org.owasp.validator.html.Policy;
@@ -24,8 +25,10 @@ import org.springframework.context.annotation.Configuration;
 
 
 @Configuration
+@RequiredArgsConstructor
 public class FilterConfig implements Filter {
 
+    final HttpServletRequest request;
 
     @Override
     public void init(javax.servlet.FilterConfig filterConfig) throws ServletException {
@@ -43,12 +46,14 @@ public class FilterConfig implements Filter {
         request.setCharacterEncoding("UTF8");
         response.setCharacterEncoding("UTF8");
 
+        String  url = request.getRequestURI();
+        boolean loginStatus = true;
+
+
         // xss control
         long start = System.currentTimeMillis();
         try {
 
-            String  url = request.getRequestURI();
-            System.out.println("url : " + url);
             Policy policy = Policy.getInstance(FilterConfig.class.getResourceAsStream("/antisamy-slashdot-1.4.4.xml"));
             AntiSamy sanitizer = new AntiSamy(policy);
 
@@ -95,6 +100,18 @@ public class FilterConfig implements Filter {
         long end = System.currentTimeMillis();
         long between = end - start;
         System.out.println( between );
+
+        if (url.equals("/") || url.equals("/login")) {
+            loginStatus = false;
+        }
+
+        if (loginStatus) {
+            boolean status = request.getSession().getAttribute("user") == null;
+            if (status) {
+                response.sendRedirect("/");
+            }
+        }
+
         chain.doFilter(request, response);
     }
 

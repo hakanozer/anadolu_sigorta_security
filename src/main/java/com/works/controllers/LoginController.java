@@ -33,7 +33,9 @@ public class LoginController {
             model.addAttribute("errors", errors);
         }else {
             boolean status = loginService.login(admin.getEmail(), admin.getPassword());
-            System.out.println("Status : " + status );
+            if (status) {
+                return "redirect:/dashboard";
+            }
             model.addAttribute("email", admin.getEmail());
         }
         return "login";
