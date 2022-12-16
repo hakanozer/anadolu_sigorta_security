@@ -1,3 +1,4 @@
+<%@ taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core" %>
 <!doctype html>
 <html lang="en">
 <head>
@@ -13,6 +14,11 @@
     <div class="container">
         <h2>Admin Login</h2>
         <div>${email}</div>
+        <c:if test="${errors != null}">
+            <c:forEach items="${errors}" var="item">
+                <li>${item.getField()} - ${item.getDefaultMessage()}</li>
+            </c:forEach>
+        </c:if>
         <form method="post" action="/login" class="col-sm-4">
             <div class="mb-3">
                 <input required type="email" name="email" placeholder="E-Mail" class="form-control" />
