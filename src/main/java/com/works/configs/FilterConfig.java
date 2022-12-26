@@ -101,7 +101,7 @@ public class FilterConfig implements Filter {
         long between = end - start;
         System.out.println( between );
 
-        if (url.equals("/") || url.equals("/login")) {
+        if (url.contains("/api") || url.equals("/") || url.equals("/login") || url.contains("h2-console") ) {
             loginStatus = false;
         }
 
@@ -109,10 +109,12 @@ public class FilterConfig implements Filter {
             boolean status = request.getSession().getAttribute("user") == null;
             if (status) {
                 response.sendRedirect("/");
+            }else {
+                chain.doFilter(request, response);
             }
+        }else {
+            chain.doFilter(request, response);
         }
-
-        chain.doFilter(request, response);
     }
 
 
